@@ -5,13 +5,18 @@ from telethon import TelegramClient, events
 
 API_ID = int(os.environ.get("API_ID"))
 API_HASH = os.environ.get("API_HASH")
-PHONE_NUMBER = os.environ.get("PHONE_NUMBER")
 WEBHOOK_URL = os.environ.get("WEBHOOK_URL")
 
+# Usamos el archivo session.session ya generado
 client = TelegramClient("session", API_ID, API_HASH)
 
 async def main():
-    await client.start(phone=PHONE_NUMBER)
+    await client.connect()
+
+    if not await client.is_user_authorized():
+        print("⚠️ La sesión no está autorizada.")
+        return
+
     print("✅ Userbot conectado correctamente")
 
     @client.on(events.NewMessage)
