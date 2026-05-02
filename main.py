@@ -3,16 +3,16 @@ import asyncio
 import requests
 from telethon import TelegramClient, events
 
-# Variables de entorno
 API_ID = int(os.environ.get("API_ID"))
 API_HASH = os.environ.get("API_HASH")
+PHONE_NUMBER = os.environ.get("PHONE_NUMBER")
 WEBHOOK_URL = os.environ.get("WEBHOOK_URL")
 
-# Crear cliente
 client = TelegramClient("session", API_ID, API_HASH)
 
 async def main():
-    print("Userbot iniciado...")
+    await client.start(phone=PHONE_NUMBER)
+    print("✅ Userbot conectado correctamente")
 
     @client.on(events.NewMessage)
     async def handler(event):
@@ -35,5 +35,4 @@ async def main():
 
     await client.run_until_disconnected()
 
-with client:
-    client.loop.run_until_complete(main())
+asyncio.run(main())
