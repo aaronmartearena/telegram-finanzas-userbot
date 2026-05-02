@@ -2,19 +2,28 @@ import os
 import asyncio
 import requests
 from telethon import TelegramClient, events
+from flask import Flask
 
+# Variables de entorno
 API_ID = int(os.environ.get("API_ID"))
 API_HASH = os.environ.get("API_HASH")
 WEBHOOK_URL = os.environ.get("WEBHOOK_URL")
 
-# Usamos el archivo session.session ya generado
+# Crear cliente Telegram
 client = TelegramClient("session", API_ID, API_HASH)
 
-async def main():
+# Crear app Flask mínima
+app = Flask(__name__)
+
+@app.route("/")
+def home():
+    return "Userbot activo"
+
+async def telegram_listener():
     await client.connect()
 
     if not await client.is_user_authorized():
-        print("⚠️ La sesión no está autorizada.")
+        print("⚠️ Sesión no autorizada")
         return
 
     print("✅ Userbot conectado correctamente")
@@ -23,7 +32,6 @@ async def main():
     async def handler(event):
         try:
             message_text = event.raw_text
-
             if not message_text:
                 return
 
@@ -40,4 +48,11 @@ async def main():
 
     await client.run_until_disconnected()
 
-asyncio.run(main())
+def run():
+    loop = asyncio.get_event_loop()
+    loop.create_task(telegram_listener())
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
+
+if __name__ == "__main__":
+    run()
